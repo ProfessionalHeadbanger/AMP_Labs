@@ -125,7 +125,7 @@ void saveResult()
     {
       switch (key)
       {
-        case 'A': // подтверждение сохрания
+        case 'A': // подтверждение сохранения
         is_input = false;
         EEPROM.put(0, calculator_data);
         break;
