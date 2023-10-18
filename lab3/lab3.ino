@@ -1,5 +1,6 @@
 #include <LiquidCrystal_I2C.h> //Дисплей - пины GND, 5V, SDA(20) и SCL(21)
-#include <Keypad.h> //Клавиатура - пины строки 13-10, столбцы 7-4
+//#include <Keypad.h> //Клавиатура - пины строки 13-10, столбцы 7-4
+#include "MyKeypad.h"
 #include <EEPROM.h>
 
 // дисплей
@@ -13,15 +14,16 @@ const byte COLS = 4; // столбцы
 const byte rowPins[ROWS] = {13, 12, 11, 10}; // распиновка строк
 const byte colPins[COLS] = {7, 6, 5, 4}; // распиновка столбцов
  
-char keys[ROWS][COLS] = { // устанавливаем значения кнопок
-  {'1', '2', '3', 'A'},
-  {'4', '5', '6', 'B'},
-  {'7', '8', '9', 'C'},
-  {'*', '0', '#', 'D'}
+char keys[ROWS*COLS] = { // устанавливаем значения кнопок
+  '1', '2', '3', 'A',
+  '4', '5', '6', 'B',
+  '7', '8', '9', 'C',
+  '*', '0', '#', 'D'
 };
  
 LiquidCrystal_I2C lcd_display(I2C_ADDR, LCD_COLUMNS, LCD_LINES); // init дисплей
-Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS); // init клавиатуру
+//Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS); // init клавиатуру
+MyKeypad keypad(ROWS, COLS, rowPins, colPins, keys);
 
 struct Data // структура для хранения вычислений, чтобы удобнее было записывать в память
 {
@@ -33,6 +35,7 @@ struct Data // структура для хранения вычислений, 
 void setup()
 {
   Serial.begin(9600); // на всякий случай
+  keypad.begin();
   lcd_display.init();
   lcd_display.backlight();
   lcd_display.print("1) Calculator"); // изначально же должен гореть 1 пункт, правильно?
@@ -125,7 +128,7 @@ void saveResult()
     {
       switch (key)
       {
-        case 'A': // подтверждение сохранения
+        case 'A': // подтверждение сохрания
         is_input = false;
         EEPROM.put(0, calculator_data);
         break;
