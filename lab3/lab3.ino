@@ -1,5 +1,5 @@
 #include <LiquidCrystal_I2C.h> //Дисплей - пины GND, 5V, SDA(20) и SCL(21)
-//#include <Keypad.h> //Клавиатура - пины строки 13-10, столбцы 7-4
+//#include <Keypad.h> //Клавиатура - пины строки 2, 3, 18, 19, столбцы 7-4
 #include "MyKeypad.h"
 #include <EEPROM.h>
 
@@ -11,7 +11,7 @@
 // клавиатура
 const byte ROWS = 4; // строки
 const byte COLS = 4; // столбцы
-const byte rowPins[ROWS] = {13, 12, 11, 10}; // распиновка строк
+const byte rowPins[ROWS] = {2, 3, 18, 19}; // распиновка строк
 const byte colPins[COLS] = {7, 6, 5, 4}; // распиновка столбцов
  
 char keys[ROWS*COLS] = { // устанавливаем значения кнопок
