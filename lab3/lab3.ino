@@ -1,5 +1,4 @@
 #include <LiquidCrystal_I2C.h> //Дисплей - пины GND, 5V, SDA(20) и SCL(21)
-//#include <Keypad.h> //Клавиатура - пины строки 2, 3, 18, 19, столбцы 7-4
 #include "MyKeypad.h"
 #include <EEPROM.h>
 
@@ -22,7 +21,6 @@ char keys[ROWS*COLS] = { // устанавливаем значения кноп
 };
  
 LiquidCrystal_I2C lcd_display(I2C_ADDR, LCD_COLUMNS, LCD_LINES); // init дисплей
-//Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS); // init клавиатуру
 MyKeypad keypad(ROWS, COLS, rowPins, colPins, keys);
 
 struct Data // структура для хранения вычислений, чтобы удобнее было записывать в память
@@ -39,7 +37,19 @@ void setup()
   lcd_display.init();
   lcd_display.backlight();
   lcd_display.print("1) Calculator"); // изначально же должен гореть 1 пункт, правильно?
+  attachInterrupt(digitalPinToInterrupt(rowPins[3]), handler, FALLING);
+  attachInterrupt(digitalPinToInterrupt(rowPins[0]), handler, FALLING);
 }
+
+volatile bool keyInterrupt = false;
+volatile char keyPressed = NO_KEY;
+
+void handler()
+{
+  keyInterrupt = true;
+  Serial.println("Interrupted");
+}
+
  
 int menu_change = 0; // 0 - 1) Calculator, 1 - 2) Memory, 2 - 3) Reset
 
@@ -123,7 +133,9 @@ void saveResult()
   bool is_input = true;
   while(is_input)
   {
+    noInterrupts();
     char key = keypad.getKey();
+    interrupts();
     if (key != NO_KEY)
     {
       switch (key)
@@ -147,7 +159,9 @@ int inputNumber()
   int input = 0;
   while(is_input)
   {
+    noInterrupts();
     char key = keypad.getKey();
+    interrupts();
     if (key != NO_KEY)
     {
       switch (key)
@@ -192,7 +206,9 @@ void Reset()
   lcd_display.print("Are you sure?");
   while(is_input)
   {
+    noInterrupts();
     char key = keypad.getKey();
+    interrupts();
     if (key != NO_KEY)
     {
       switch (key)
@@ -244,11 +260,19 @@ void mainMenu() // тоже все понятно
   }
 }
 
-void loop() // ну тут вообще максимально понятно
+void loop() 
 {
-  char key = keypad.getKey();
-  if (key != NO_KEY)
+  if (keyInterrupt)
   {
-    changeMenu(key);
+    noInterrupts();
+    keyPressed = keypad.getKey(true);
+    keyInterrupt = false;
+    interrupts();
+
+    if (keyPressed != NO_KEY)
+    {
+      Serial.println(keyPressed);
+      changeMenu(keyPressed);
+    }
   }
 }
