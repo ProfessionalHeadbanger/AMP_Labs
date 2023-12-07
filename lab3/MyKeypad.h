@@ -80,4 +80,3 @@ private:
   byte* rowPins;
   byte* colPins;
 };
-
