@@ -119,7 +119,7 @@ void Calculate() // тут и так все ясно
   {
     return;
   }
-  calculator_data.result = calculator_data.first_number ^ calculator_data.second_number; // ^ - XOR
+  calculator_data.result = calculator_data.first_number & calculator_data.second_number; // & - AND
   lcd_display.clear();
   lcd_display.print("Result:");
   lcd_display.print(calculator_data.result);
@@ -194,6 +194,13 @@ int inputNumber()
         is_input = false;
         return 0;
         break;
+        case 'C': // загрузка текущего числа из памяти
+        lcd_display.clear();
+        input = memory_data.result;
+        lcd_display.print("From mem: ");
+        lcd_display.setCursor(0, 1);
+        lcd_display.print(input);
+        break;
       }
     }
   }
@@ -249,7 +256,7 @@ void mainMenu() // тоже все понятно
     initialReset();
     EEPROM.get(0, memory_data);
     lcd_display.print(memory_data.first_number);
-    lcd_display.print("XOR");
+    lcd_display.print("AND");
     lcd_display.print(memory_data.second_number);
     lcd_display.print('=');
     lcd_display.print(memory_data.result);
